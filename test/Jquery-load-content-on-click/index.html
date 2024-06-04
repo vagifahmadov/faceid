@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Home</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<img src="images/product.webp">
+					</div>
+					<h4>Motorola Edge+</h4>
+					<p>5000 mAh Battery</p>
+					<span>Now Rs74999</span>
+				</div>
+			</div><!--col-xs-4-->
+		</div>
+	</div>
+
+	<button class="btn btn-danger center-block loadMore">Load More</button>
+
+
+
+<script src="js/jquery-latest.min.js"></script>
+<script>
+	$(".col-xs-4").slice(0, 3).show(); //showing 3 div
+
+	$(".loadMore").on("click",function(){
+		$(".col-xs-4:hidden").slice(0, 3).show(); //showing 3 hidden div on click
+
+		if($(".col-xs-4:hidden").length ==0)
+		{
+			$(".loadMore").fadeOut(); //this will hide
+			//button when length is 0
+		}
+	})
+</script>
+</body>
+</html>

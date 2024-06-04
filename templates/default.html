@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Giriş-çıxış sistemi</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pages.css') }}">
+    <link rel="shortcut icon" href="#">
+
+    <!-- ADMIN TOOLS -->
+    <!-- Google Font: Source Sans Pro -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='admin/font//css?family=Source+Sans+Pro:300,400,400i,700&display=fallback') }}"> -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/icons/ionicons.min.css') }}">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/jqvmap/jqvmap.min.css') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/dist/css/adminlte.min.css') }}">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/daterangepicker/daterangepicker.css') }}">
+    <!-- summernote -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/summernote/summernote-bs4.min.css') }}">
+
+    <!-- animation -->
+    <script src="{{ url_for('static', filename='logo/createjs-2015.11.26.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='logo/anima.js') }}"></script>
+    <!-- helper -->
+    <script src="{{ url_for('static', filename='js/helper.js') }}"></script>
+    <!-- notify -->
+    <!-- sweetalert2 effect -->
+    <!-- <script src="{{ url_for('static', filename='sweetalert2/sweetalert2.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='sweetalert2/sweetalert2.min.css') }}"> -->
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
+    <!-- TaTa toast -->
+    <script src="{{ url_for('static', filename='notificationLab/dist/tata.js') }}"></script>
+    <script>
+        $(document).ready(function () {
+            var canvas, stage, exportRoot, anim_container, dom_overlay_container, fnStartAnimation;
+            window.terminalIpList = [];
+            // ip
+            $.get( "/ipList?defaultToken=DEFAULT", function( data ) {
+                terminalIpList = data;
+                console.log('inside', terminalIpList);
+            }).done(function() {
+                getUserIP(function(ip){
+                    const localIp = ip;
+                    console.log('Your ip is: '+localIp);
+                    if (terminalIpList.includes(localIp)){
+                        console.log("Your device is terminal.");
+                    }else{
+                        // $.notify("Hello World");
+                        console.log("Your device ("+localIp+") is not contains in terminal list.");
+                        document.getElementById("rs").style.display = "none";
+                        // notfy
+                        if (localIp !== '10.90.30.73'){
+                        tata.log('Qeydiyyatla bağlı problem yaşayırsınız?', 'Problemi aradan qaldırmaq üçün bura klikləyin.', {
+                            duration: 15000,
+                            onClick: function(){
+                                window.location.href = "/admin";
+                            },
+                            })
+                        }
+                        // notfy
+                    }
+                });
+            });
+            // ip
+        });
+
+        // anima
+        function init() {
+            canvas = document.getElementById("canvas");
+            anim_container = document.getElementById("animation_container");
+            dom_overlay_container = document.getElementById("dom_overlay_container");
+            var comp=AdobeAn.getComposition("3F63CCB6D2D1104694351256E9E34981");
+            var lib=comp.getLibrary();
+            handleComplete({},comp);
+        }
+        function handleComplete(evt,comp) {
+            //This function is always called, irrespective of the content. You can use the variable "stage" after it is created in token create_stage.
+            var lib=comp.getLibrary();
+            var ss=comp.getSpriteSheet();
+            exportRoot = new lib.prj();
+            stage = new lib.Stage(canvas);
+            stage.addChild(exportRoot);	
+            //Registers the "tick" event listener.
+            fnStartAnimation = function() {
+                createjs.Ticker.setFPS(lib.properties.fps);
+                createjs.Ticker.addEventListener("tick", stage);
+            }	    
+            //Code to support hidpi screens and responsive scaling.
+            function makeResponsive(isResp, respDim, isScale, scaleType) {		
+                var lastW, lastH, lastS=1;		
+                window.addEventListener('resize', resizeCanvas);		
+                resizeCanvas();		
+                function resizeCanvas() {			
+                    var w = lib.properties.width, h = lib.properties.height;			
+                    var iw = window.innerWidth, ih=window.innerHeight;			
+                    var pRatio = window.devicePixelRatio || 1, xRatio=iw/w, yRatio=ih/h, sRatio=1;			
+                    if(isResp) {                
+                        if((respDim=='width'&&lastW==iw) || (respDim=='height'&&lastH==ih)) {                    
+                            sRatio = lastS;                
+                        }				
+                        else if(!isScale) {					
+                            if(iw<w || ih<h)						
+                                sRatio = Math.min(xRatio, yRatio);				
+                        }				
+                        else if(scaleType==1) {					
+                            sRatio = Math.min(xRatio, yRatio);				
+                        }				
+                        else if(scaleType==2) {					
+                            sRatio = Math.max(xRatio, yRatio);				
+                        }			
+                    }			
+                    canvas.width = w*pRatio*sRatio;			
+                    canvas.height = h*pRatio*sRatio;
+                    canvas.style.width = dom_overlay_container.style.width = anim_container.style.width =  w*sRatio+'px';				
+                    canvas.style.height = anim_container.style.height = dom_overlay_container.style.height = h*sRatio+'px';
+                    stage.scaleX = pRatio*sRatio;			
+                    stage.scaleY = pRatio*sRatio;			
+                    lastW = iw; lastH = ih; lastS = sRatio;		
+                }
+            }
+            makeResponsive(false,'both',false,1);	
+            AdobeAn.compositionLoaded(lib.properties.id);
+            fnStartAnimation();
+        }
+        // links
+        function goto_link(type){
+            if (type == 'rey'){
+                window.open('http://sorgu.asan.org/', '_blank');
+            }else{
+                window.location = "/capture?type="+type;
+            }
+        }
+    </script>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed" onload="init();" style="height: 100%; width: 100%;">
+
+<div class="contentarea_default" style="display: flex;">
+    <div class="innercontainer">
+        <div class="logo">
+            <div id="animation_container" style="background-color:rgba(255, 255, 255, 0.00); position: relative; margin: auto;">
+                <canvas id="canvas" height="192" style="transform:translateX(-50%) scale(0.8); left: 50%; position: absolute; top: -30%;"></canvas>
+                <div id="dom_overlay_container" style="pointer-events:none; overflow:hidden; width:450px; height:192px; position: absolute; left: 0px; top: 0px; display: block;">
+                </div>
+            </div>
+        </div>
+        <div class="in_out_buttons">
+            <div class="in" style="margin-bottom: 0.8em; width: 100%;" id="rs">
+                <button class="btn btn-block btn-primary btn-lg" onclick="goto_link('rey')" style="font-size: 2.4em; height: 3em;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-card-checklist"  width="1em" height="1em" viewBox="0 0 16 16" >
+                        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                        <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                      </svg>                   
+                    RƏY SORĞUSU
+                </button>
+            </div>
+            <div class="in" style="margin-bottom: 0.8em; width: 100%;">
+                <button class="btn btn-block btn-primary btn-lg" onclick="goto_link('in')" style="font-size: 2.4em; height: 3em;">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-in-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M8.146 11.354a.5.5 0 0 1 0-.708L10.793 8 8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0z"/>
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 1 8z"/>
+                        <path fill-rule="evenodd" d="M13.5 14.5A1.5 1.5 0 0 0 15 13V3a1.5 1.5 0 0 0-1.5-1.5h-8A1.5 1.5 0 0 0 4 3v1.5a.5.5 0 0 0 1 0V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5h-8A.5.5 0 0 1 5 13v-1.5a.5.5 0 0 0-1 0V13a1.5 1.5 0 0 0 1.5 1.5h8z"/>
+                      </svg>
+                    GİRİŞİN QEYDİYYATI  (əməkdaşlar üçün)
+                </button>
+            </div>
+            <div class="out" style=" width: 100%;">
+                <button id="warning_button" class="btn btn-block btn-primary btn-lg" onclick="goto_link('out')" style="font-size: 2.4em; height: 3em;">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-box-arrow-in-left" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M7.854 11.354a.5.5 0 0 0 0-.708L5.207 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/>
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0 0 1h9A.5.5 0 0 0 15 8z"/>
+                        <path fill-rule="evenodd" d="M2.5 14.5A1.5 1.5 0 0 1 1 13V3a1.5 1.5 0 0 1 1.5-1.5h8A1.5 1.5 0 0 1 12 3v1.5a.5.5 0 0 1-1 0V3a.5.5 0 0 0-.5-.5h-8A.5.5 0 0 0 2 3v10a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-1.5a.5.5 0 0 1 1 0V13a1.5 1.5 0 0 1-1.5 1.5h-8z"/>
+                      </svg>                      
+                    ÇIXIŞIN QEYDİYYATI (əməkdaşlar üçün)
+                </button>
+            </div>
+        </div>
+    </div>
+   
+</div>
+
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+
+</body>
+</html>

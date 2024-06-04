@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Home</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css') }}">
+</head>
+<body>
+
+	<div class="container">
+		<div class="row">
+			{% for usr in user_list: %}
+			<div class="col-xs-4">
+				<div class="employee_card">
+					<div class="image">
+						<a href="/user/{{ usr['id'] }}"><img src="data:{{ usr['imageList'][-1]['contentType'] }};base64, {{ usr['imageList'][-1]['image'] }}" alt="{{ usr['id'] }}" width="100" height="auto" class="userImage"></a>
+					</div>
+					<h4>{{ usr["firstName"] }} {{ usr["lastName"] }}</h4>
+					<p>{{ usr['structure'] }}</p>
+					<span>{{ usr['posName'] }}</span>
+				</div>
+			</div><!--col-xs-4-->
+			{% endfor %}
+		</div>
+	</div>
+
+	<!-- <button class="btn btn-danger center-block loadMore">Load More</button> -->
+
+
+
+<script src="{{ url_for('static', filename='js/jquery-latest.min.js') }}"></script>
+<script>
+	var employee_count = 15;
+	function api_post(offset, callback){
+		var xhr = new XMLHttpRequest();
+		var url = "/index";
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xhr.onreadystatechange = function () {
+			if (this.readyState === 4 && this.status === 200) {
+				resp = JSON.parse(this.responseText);
+				callback(resp);
+			}
+		};
+		var offset = parseInt(offset);
+		var offset_data = JSON.stringify({"offset": offset});
+		xhr.send(offset_data);
+	};
+
+	$(".col-xs-4").slice(0, 15).show(); //showing 15 div
+	// $(".loadMore").on("click",function(){
+	// 	// cont
+	// 	employee_count += 15;
+	// 	api_post(employee_count, callBackFunck);
+	// 	function callBackFunck(resp){
+	// 		text_append = '';
+	// 		resp = resp[0];
+	// 		for (var i = 0; i < resp.length; i++) {
+	// 			text_append += '<div class="col-xs-4" style="display: none;"><div class="employee_card"><div class="image"><a href="/user/'+resp[i].id+'"><img src="data:'+resp[i].imageList.slice(-1)[0].contentType+';base64, '+resp[i].imageList.slice(-1)[0].image+'"  width="100" height="auto" class="userImage"></a></div><h4>'+resp[i].firstName+' '+resp[i].lastName+'</h4><p>'+resp[i].structure+'</p><span>'+resp[i].posName+'</span></div></div><!--col-xs-4-->';		
+	// 		}
+	// 		$('.row').append(text_append);
+	// 		if($(".col-xs-4:hidden").length ==0){
+	// 			$(".loadMore").fadeOut(); //this will hide
+	// 			//button when length is 0
+	// 		}
+	// 	}
+	// 	$(".col-xs-4:hidden").slice(0, 15).fadeIn(); //showing 15 hidden div on click
+	// })
+	
+	window.onscroll = function(ev) {
+    	if (($(window).innerHeight() + $(window).scrollTop()) >= $("body").height()) {
+			// cont
+			employee_count += 15;
+			api_post(employee_count, callBackFunck);
+			function callBackFunck(resp){
+				text_append = '';
+				resp = resp[0];
+				for (var i = 0; i < resp.length; i++) {
+					text_append += '<div class="col-xs-4" style="display: none;"><div class="employee_card"><div class="image"><a href="/user/'+resp[i].id+'"><img src="data:'+resp[i].imageList.slice(-1)[0].contentType+';base64, '+resp[i].imageList.slice(-1)[0].image+'"  width="100" height="auto" class="userImage"></a></div><h4>'+resp[i].firstName+' '+resp[i].lastName+'</h4><p>'+resp[i].structure+'</p><span>'+resp[i].posName+'</span></div></div><!--col-xs-4-->';		
+				}
+				$('.row').append(text_append);
+			}
+			$(".col-xs-4:hidden").slice(0, 15).fadeIn(); //showing 15 hidden div on click
+		}
+	};
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Helth status of qeydiyyat.asan.org</title>
+<meta charset="UTF-8">
+<link href="{{ url_for('static', filename='/health/css/bootstrap.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='/health/style.css') }}" rel="stylesheet">
+<script src="{{ url_for('static', filename='/health/js/bootstrap.js') }}"></script>
+</head>
+<body>
+    <div class="card v-align" style="width: 26rem; height: 9rem;">
+        <div class="card-header">
+            Status project <a href="http://qeydiyyat.asan.org" class="text-decoration-none">qeydiyyat.asan.org</a>
+        </div>
+        <div class="card-body">
+            <span class="text-success">Back-end -> Ok</span><br>
+            <span class="{{ table_data.style }}">DatabaseMongoDB -> {{ table_data.errmsgNOSQL }} - {{ table_data.codeNOSQL }}</span><br>
+            <span class="{{ table_data.style }}">DatabaseSQL -> {{ table_data.errmsgSQL }} - {{ table_data.codeSQL }}</span>
+        </div>
+    </div>
+</body>
+</html>

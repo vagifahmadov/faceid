@@ -1,0 +1,11 @@
+.v-align {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -4rem;
+    margin-left: -13rem;
+  }
+  body {
+      background-image: url("img/bg.png");
+      background-repeat: no-repeat;
+  }

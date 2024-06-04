@@ -1,0 +1,816 @@
+<!doctype html>
+
+<head>
+    <link rel="shortcut icon" href="#">
+
+    <title>Qeydiyyatdan keç</title>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pages.css') }}">
+    <!-- ADMIN TOOLS -->
+    <!-- Google Font: Source Sans Pro -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='admin/font/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback') }}"> -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/fontawesome-free/css/all.min.css') }}">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/icons/ionicons.min.css') }}">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css') }}">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+    <!-- JQVMap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/jqvmap/jqvmap.min.css') }}">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+    <!-- Daterange picker -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/daterangepicker/daterangepicker.css') }}">
+    <!-- summernote -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/summernote/summernote-bs4.min.css') }}">
+    <!-- MODALS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/plugins/toastr/toastr.min.css') }}">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/dist/css/adminlte.min.css') }}">
+</head>
+    <style>
+    /* CSS comes here */
+        body{
+            width: 100%;
+            height: 100%;
+        }
+        #video {
+            border: 1px solid black;
+            width: 320px;
+            height: 240px;
+        }
+
+        #photo {
+            border: 1px solid black;
+            width: 320px;
+            height: 240px;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .camera {
+            width: 340px;
+            display: inline-block;
+        }
+
+        .output {
+            width: 340px;
+            display: inline-block;
+        }
+
+        #startbutton {
+            display: block;
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+            bottom: 36px;
+            padding: 5px;
+            top: -80px;
+            /* background-color: #6a67ce;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            color: rgba(255, 255, 255, 1.0); */
+            cursor: pointer;
+        }
+
+        .contentarea {
+            font-size: 16px;
+            font-family: Arial;
+            text-align: center;
+        }
+    </style>
+
+<body>
+    <div class="contentarea">
+
+        <div class="camera" id="my_camera"></div>
+        <div id="countdown"></div>
+        
+        <div>
+                <button type="button" class="btn_photo btn_photo-outline-primary"  onclick="take_snapshot_and_send_request()" id="startbutton">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-camera-fill" fill="currentColor">
+                        <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"></path>
+                        <path fill-rule="evenodd" d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"></path>
+                      </svg>                      
+                </button>
+
+                <input type="hidden" name="b64image" id="b64image">
+        </div>
+
+        <div id="back">
+            <button type="button" class="btn btn-block btn-primary btn-lg" onclick="back_page();">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left" fill="currentColor" style="
+                scale: 1.6;
+                margin-top: 0.5px;
+                margin-right: 10px;
+                ">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"></path>
+                </svg>
+                Geri</button>
+        </div>
+
+        <!-- REQUEST WORK LOG -->
+        <div class="card card-danger" id="error_box" style="display: none;">
+            <div class="card-header">
+              <h3 class="card-title">Xəta!</h3>
+
+              <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="remove" id="close_error"><i class="fas fa-times"></i>
+                </button>
+              </div>
+              <!-- /.card-tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                Məlumat bazasına qoşulma mümkün olmadı
+            </div>
+            <!-- /.card-body -->
+        </div>
+
+        <div class="col-md-3" id="success_box" style="display: none;">
+            <div class="card card-outline card-success">
+                <div class="card-body">
+                    <img  id="work_log_img" class="img-circle elevation-2" alt="User Avatar">
+                    <svg width=" 5em" =""="" height="5.5em" viewBox="0 -3 18 18" class="bi bi-check-square" fill="currentColor" id="success_icon">
+                    <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"></path>
+                    <path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"></path>
+                    </svg>
+                    <h4 id="success_body_head"></h4>
+                    <span id="success_body"></span>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- REQUEST WORK LOG -->
+        
+
+        <div class="modal fade" id="modal-default" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4 class="modal-title">FİN ilə qeydiyyatdan keçmək</h4>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY START -->
+                    <div id="sourceModal">
+                        <input type="text" autocomplete="off" class="form-control form-control-border" id="exampleInputBorder" placeholder="FİN" minlength="7" maxlength="7" size="7">
+                        <div id="resultFIN"></div>
+                        
+                        <!-- info employee start-->
+                        <div class="info-box" style="display: none;">
+                            <img src="" alt="5ffed863a3907fab2a008ccd" width="100" height="auto" class="userImage">
+                
+                            <div class="info-box-content">
+                                <span class="info-box-text">Employee</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- info employee end -->
+                        
+                        <div id="my_camera_fin"></div>
+                    </div>
+                    <!-- MODAL BODY END -->
+                </div>
+                <div class="modal-footer justify-content-between"  style="z-index:100">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="30" fill="currentColor" class="bi bi-x" viewBox="1 -8 16 16">
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
+                      </svg>
+                       Bağla</button>
+                  <button type="button" class="btn btn-success swalDefaultSuccess" onclick="ssnapshot_webcam_fin()"  data-dismiss="modal" id="submitFIN" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="30" fill="currentColor" class="bi bi-check-lg" viewBox="1 -8 16 16">
+                        <path d="M13.485 1.431a1.473 1.473 0 0 1 2.104 2.062l-7.84 9.801a1.473 1.473 0 0 1-2.12.04L.431 8.138a1.473 1.473 0 0 1 2.084-2.083l4.111 4.112 6.82-8.69a.486.486 0 0 1 .04-.045z"></path>
+                      </svg>  
+                    Təsdiq et
+                </button>
+                </div>
+              </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <div class="modal fade" id="modal-watning" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">DİQQƏT!</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img src="{{ url_for('static', filename='images/icons/warnings.jpg') }}" id="warnings">
+            </div>
+            <!-- <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Oldu</button>
+            </div> -->
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+        </div>
+
+        <div id="result" class="result">
+
+            <!-- ADMIN tool widgate -->
+            <div id="notreg">
+                <div class="header_text"></div>
+                <img  id="img_result_not" class="img-square elevation-2" alt="User Avatar">
+                <p id="face_process_time_not"></p>
+            </div>
+
+            
+            
+            <div class="card card-widget widget-user shadow" id="reg">
+                <!-- Add the bg color to the header using any of the bg-* classes -->
+                <div class="widget-user-header bg-warning">
+                  <h3 class="widget-user-username"></h3>
+                </div>
+                <div class="widget-user-image" id="header_found">
+                    <img  id="found_result" class="img-circle elevation-2" alt="User Avatar">
+                </div>
+                <div class="card-footer" id="found_result_body">
+                  <div class="row" id="found_result_row">
+                    <!-- /.col -->
+                    <div class="col-sm-4 border-right">
+                        <div class="description-block">
+                            <img  id="img_result_ok" class="img-square elevation-2" alt="User Avatar" >
+                        </div>
+                    <!-- /.description-block -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-4 border-right">
+                      <div class="description-block">
+                          <div id="type_reg"></div>
+                        <h5 class="description-header" id="face_process_time_ok"></h5>
+                      </div>
+                      <!-- /.description-block -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-4">
+                        <div class="description-block">
+                          <h5>Xahiş edirik təyin olunmuş şəxs olduğunuzu təsdiqləyin. Əks halda <b>təkrar</b> cəhd edin və ya <b>digər üsulla qeydiyyat</b>dan keçin. </h5>
+                        </div>
+                        <!-- /.description-block -->
+                    </div>
+                    <!-- /.col -->
+                  </div>
+                  <!-- /.row -->
+                </div>
+              </div>
+            <div id="mobileVersion">
+                <button id="ok" type="button" class="btn_txt btn_ok-outline-primary" onclick="user_work_log();">
+                Təsdiq
+                <svg id="result_icons" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-check-circle" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                    <path fill-rule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"></path>
+                </svg>
+                </button>
+
+                <button id="try_ag" type="button" class="btn_txt btn_ok-outline-primary" onclick="try_again()">
+                    Təkrar
+                    <svg id="result_icons" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-counterclockwise" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                    </svg>
+                </button>
+
+                <button id="not" type="button" class="btn_txt btn_oth-outline-primary" data-toggle="modal" data-target="#modal-default" onclick="webcam_fin()">
+                    <span>Digər üsulla qeydiyyat</span>
+                    <svg id="result_icons" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right-circle" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path fill-rule="evenodd" d="M4 8a.5.5 0 0 0 .5.5h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5A.5.5 0 0 0 4 8z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- </div> -->
+        
+            <div id="my_camera"></div>
+    </div>
+    <div class="loadingoverlay"></div>
+    <div class="loading" style="z-index: 11; display: none;">
+        <div class="lds-hourglass"><span class="cheking">Yüklənir...</span></div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
+    <!-- <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script> -->
+    <script src="{{ url_for('static', filename='admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='admin/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+
+    <script>
+        $(function() {
+            // var Toast = Swal.mixin({
+            // toast: true,
+            // position: 'top-end',
+            // showConfirmButton: false,
+            // timer: 3500
+            // });
+            $('.swalDefaultSuccess').click(function() {
+                console.log('Clicked');
+                // Toast.fire({
+                //     icon: 'success',
+                //     title: 'Təsdiq edildi.'
+                // })
+            });
+        });
+        $(document).ready(function(){
+            $("#result").hide();
+        });
+    </script>
+    <!-- First, include the Webcam.js JavaScript Library -->
+	<script type="text/javascript" src="{{ url_for('static', filename='webcamjs/webcam.min.js') }}"></script>
+	<!-- Configure a few settings and attach camera -->
+	<script language="JavaScript">
+        // detect mobile v.
+        window.mobileCheck = function() {
+            let check = false;
+            (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+            return check;
+        };
+        var detectMobileDevice = mobileCheck();
+        if (detectMobileDevice === true){
+            $("#mobileVersion").css("margin-top", "200px");
+        }
+
+        // timeout
+        var downloadTimer = null;
+        var page_timeout = null;
+        window.success_img = null;
+        var type_url = parseURLParams()["type"][0];
+        function startTimeout(time){
+            page_timeout = setTimeout(function(){ $("#success_box").fadeOut(); window.location.href="/default"; }, parseInt(time)*1000);
+        }
+
+        function stopTimeout(page_timeout) {
+            window.clearTimeout(page_timeout);
+        }
+        
+        function redirected_flashing() {
+            $('#flashing').fadeOut(500);
+            $('#flashing').fadeIn(500);
+        }
+
+        function show_result_buttons(){
+            $("#ok").show();
+            $("#try_ag").show();
+            $("#not").show();
+            $("#not span").text("Digər üsulla qeydiyyat");
+            $("#not").css("width", "380px");
+        }
+
+        function show_error_result_buttons(){
+            $("#try_ag").show();
+            $("#not").show();
+            $("#not span").text("Digər üsulla qeydiyyat");
+            $("#not").css("width", "380px");
+        }
+
+        function stopTimerCountdown(downloadTimer){
+            clearInterval(downloadTimer);
+            $("#countdown").hide();
+        }
+
+        function type_to_display(){
+            if (type_url == "in"){
+                $("#type_reg").html("Giriş vaxtı");
+                $("#type_reg").css({"border": "3px solid #67b600", "color": "#67b600"});
+                $()
+            }else if(type_url == "out"){
+                $("#type_reg").html("Çıxış vaxtı");
+                $("#type_reg").css({"border": "3px solid #ffc107", "color": "#ffc107"});
+            }else{
+                $("#type_reg").html("Bilinməyən vəziyyət");
+                $("#type_reg").css({"border": "3px solid red", "color": "red"});
+            }
+        }
+
+        function countdown_timeout(timeleft){
+            downloadTimer = setInterval(function(){
+                $("#countdown").fadeIn();
+                $("#countdown").css('color', '#fff');
+                var minute = timeleft/60;
+                var secound = timeleft;
+                while (secound >= 60){
+                    secound -= 60;
+                }
+                
+                if (secound == 0){
+                    show_secound = "00";
+                } else if(secound < 10){
+                    show_secound = "0"+secound.toString();
+                }else{
+                    show_secound = secound.toString();
+                }
+                if (Math.floor(minute) == 0){
+                    show_minute = "00";
+                }else if (Math.floor(minute) < 10){
+                    show_minute = "0"+Math.floor(minute).toString();
+                }else{
+                    show_minute = Math.floor(minute).toString();
+                }
+
+                result = show_minute+":"+show_secound;
+
+                if (timeleft < 11){
+                    result = '<span id="flashing"><svg id="back_flashing" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left" fill="currentColor"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg></span>  '+result;
+                    $("#countdown").css('margin-left', -70);
+                }
+
+                document.getElementById("countdown").innerHTML = result;
+                timeleft -= 1;
+                
+                if (timeleft < 30){
+                    $("#countdown").css('color', '#ed790c');
+                    setInterval(redirected_flashing, 1000);
+                }
+
+                if (timeleft < 11){
+                    $("#countdown").css('color', '#ed410c');
+                }
+
+                if (timeleft < 6){
+                    $("#countdown").css('color', '#db0909');
+                }
+                if(timeleft <= 0){
+                    clearInterval(downloadTimer);
+                    $("#countdown").fadeOut();
+                }
+            }, 1000);
+        }
+        
+        type_to_display();
+        startTimeout(35);
+        countdown_timeout(35);
+        
+        // timeout end
+
+        function back_page(){
+            window.location.href="/default"
+        }
+
+        $(".lds-hourglass").hide();
+        $(".loadingoverlay").hide();
+        $("#notreg").hide();
+        $("#reg").hide();
+        $("#error_box").hide();
+        $("#success_box").hide();
+        var user_id_data = null;
+        var user_img_data = null;
+
+        $("#close_error").click(function(){
+            $("#error_box").hide();
+            $(".loadingoverlay").hide();
+        });
+
+        function user_work_log(){
+            var data_request = {
+                "userId": user_id_data,
+                "type": parseURLParams()["type"][0],
+                "byFin": false
+            }
+            $.ajax({
+                type: "POST",
+                url: "/workLog",
+                // The key needs to match your method's input parameter (case-sensitive).
+                data: JSON.stringify(data_request),
+                contentType: "application/json",
+                dataType: "json",
+                cache: false,
+                beforeSend: function(){
+                    $(".cheking").html("Təsdiqlənir...");
+                    before_send();
+                },
+                success: function(data){
+                    success_work_log(data);
+                    // console.log(data);
+                },
+                error: function(errMsg) {
+                    error_case();
+                    $("#error_box").show();
+                }
+            });
+        }
+
+
+        function parseURLParams() {
+            var url = window.location.href;
+            var queryStart = url.indexOf("?") + 1,
+                queryEnd   = url.indexOf("#") + 1 || url.length + 1,
+                query = url.slice(queryStart, queryEnd - 1),
+                pairs = query.replace(/\+/g, " ").split("&"),
+                parms = {}, i, n, v, nv;
+
+            if (query === url || query === "") return;
+
+            for (i = 0; i < pairs.length; i++) {
+                nv = pairs[i].split("=", 2);
+                n = decodeURIComponent(nv[0]);
+                v = decodeURIComponent(nv[1]);
+
+                if (!parms.hasOwnProperty(n)) parms[n] = [];
+                parms[n].push(nv.length === 2 ? v : null);
+            }
+            return parms;
+        }
+        
+        function before_send(){
+            $(".lds-hourglass").fadeIn("slow");
+            $(".loadingoverlay").fadeIn("slow");
+            $(".loading").show();
+        }
+
+        function currnt_time(result_type, eventTime){
+            var now = new Date();
+            // var pretty = [
+            // now.getHours(),
+            // ':',
+            // now.getMinutes()
+            // ].join('');
+            var pretty = eventTime;
+            if (result_type == true){
+                $('#face_process_time_ok').html(pretty);
+            }else{
+                $('#face_process_time_not').html(pretty);
+            }
+        }
+
+        function try_again(){
+            Webcam.attach('#my_camera');
+            $('#my_camera').show();
+            $("#result").hide();
+            $("#startbutton").fadeIn("slow");
+            $("#notreg").hide();
+            $("#reg").hide();
+            $("#back").show();
+            startTimeout(35);
+            countdown_timeout(35);
+        }
+
+        function display_param(response_schema){
+            var full_name = response_schema.person;
+            window.user_id_data = response_schema.foundId;
+            var found_img = response_schema.foundImage;
+            var temp_file = "data:image/jpeg;base64,"+response_schema.tempFile;
+            var result_type = false;
+
+            $("#result").show();
+            $("#found_result").show();
+
+            if (found_img != null){
+                window.user_img_data = "data:image/jpeg;base64,"+response_schema.foundImage
+                $("#img_result_ok").attr("src", temp_file);
+                $("#reg").show();
+                show_result_buttons();
+                found_img = "data:image/jpeg;base64,"+found_img;
+                $("#found_result").attr("src", found_img);
+                $(".widget-user-username").html(full_name);
+                $("#ok").show();
+                result_type = true;    
+            }else{
+                $("#img_result_not").attr("src", temp_file);
+                $(".header_text").html(full_name);
+                $("#notreg").show();
+                $("#found_result").hide();
+                $("#ok").hide();
+            }
+            currnt_time(result_type, response_schema.eventTime);
+        }
+
+        function success(response_schema){
+            $(".lds-hourglass").fadeOut("slow");
+            $(".loadingoverlay").fadeOut("slow");
+            show_error_result_buttons();
+            if (response_schema != null){
+                display_param(response_schema);
+            }
+        }
+
+        function success_work_log(response_data){
+            show_result_buttons();
+            // success notfy
+            var Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3500
+            });
+            Toast.fire({
+                icon: 'success',
+                title: 'Təsdiq edildi.'
+            });
+            // success notfy
+            $(".lds-hourglass").fadeOut("slow");
+            $(".loadingoverlay").fadeOut("slow");
+            $("#success_box").fadeIn("slow");
+            $("#result").fadeOut("slow");
+            if(success_img != null){
+                 $("#work_log_img").attr("src", success_img);
+            }else if (user_img_data != null){
+                $("#work_log_img").attr("src", user_img_data);
+            }
+            $("#success_body_head").html(response_data.response.data.user);
+            $("#success_body").html("Qeydiyyat vaxtı: <b>"+response_data.response.data.time+"</b>");
+            setTimeout(function(){ $("#success_box").fadeOut(); window.location.href="/default"; }, 3000);
+        }
+        
+        function faceNotDetect(){
+            show_error_result_buttons();
+            $("#not span").text("Yenidən digər üsulla qeydiyyat");
+            $("#not").css("width", "520px");
+            $(".lds-hourglass").fadeOut("slow");
+            $(".loadingoverlay").fadeOut("slow");
+            $("#modal-watning").modal('show');
+        }
+
+        function error_case(){
+        $(".lds-hourglass").fadeOut("slow");
+        }
+        function api_post(data_uri){
+            var xhr = new XMLHttpRequest();
+            var url = "/capture";
+            before_send();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var json = JSON.parse(xhr.responseText);
+                    success(json);
+                    // console.log();
+                }
+            };
+            var data = JSON.stringify({"b64image": data_uri});
+            xhr.send(data);
+        };
+
+		// Webcam.set({
+		// 	width: 750,
+		// 	height: 424,
+		// 	image_format: 'jpeg',
+		// 	jpeg_quality: 100
+		// });
+
+        Webcam.set({
+			width: 1000,
+			height: 566,
+			image_format: 'jpeg',
+			jpeg_quality: 100,
+            force_flash: false,
+            flip_horiz: true,
+            fps: 45
+		});
+
+		Webcam.attach( '#my_camera' );
+
+
+		function take_snapshot_and_send_request() {
+            // take snapshot and get image data
+            stopTimeout(page_timeout);
+            stopTimerCountdown(downloadTimer);
+            // break countdown_timeout;
+            $("#startbutton").hide();
+            // $("#countdown").hide();
+			Webcam.snap( function(data_uri) {
+				// display results in page
+                $("#photo").attr("src", data_uri);
+                $("#b64image").attr("value", data_uri);
+                $(".cheking").html("Yoxlanılır...");
+                Webcam.reset();
+                $("#my_camera").hide();
+                $("#back").hide();
+                api_post(data_uri);
+			});
+		}
+
+        function webcam_fin(){
+            Webcam.set({
+                width: 300,
+                height: 200,
+                image_format: 'jpeg',
+                jpeg_quality: 100,
+                force_flash: false,
+                flip_horiz: true,
+                fps: 45
+            });
+            Webcam.attach( '#my_camera_fin' );
+        }
+
+        function ssnapshot_webcam_fin(){
+            // take snapshot and get image data
+			Webcam.snap( function(data_uri) {
+                user_work_log_fin(data_uri, fin_user_id, success_img);
+			} );
+        }
+
+        // MODAL FIN
+        $("#modal-default").on("hidden.bs.modal", function () {
+            Webcam.reset();
+            $(".info-box").hide();
+            $("#exampleInputBorder").val("");
+            $("#resultFIN").html("<b></b>")
+        });
+        
+        function user_work_log_fin(b64Img, employee_id){
+            var data_request = {
+                "userId": employee_id,
+                "type": parseURLParams()["type"][0],
+                "byFin": true,
+                "image": b64Img
+            }
+            $.ajax({
+                type: "POST",
+                url: "/workLog",
+                // The key needs to match your method's input parameter (case-sensitive).
+                data: JSON.stringify(data_request),
+                contentType: "application/json",
+                dataType: "json",
+                cache: false,
+                beforeSend: function(){
+                    $(".cheking").html("Təsdiqlənir...");
+                    before_send();
+                },
+                success: function(data){
+                    if (data.response.error == false){
+                        success_work_log(data);
+                    }else{
+                        if (data.response.message == 'faceDetectProblem'){
+                            faceNotDetect();
+                        }else{
+                            console.log('Olmadi abi');
+                        }
+                    }
+                    // success_work_log(data);
+                    // console.log(data);
+                },
+                error: function(errMsg) {
+                    error_case();
+                    $("#error_box").show();
+                }
+            });
+        }
+
+        function find_by_pin(user_pin){
+            var xhr = new XMLHttpRequest();
+            var url = "/findEmployeeByPin";
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var json = JSON.parse(xhr.responseText);
+                    var data_employee = json[0].data;
+                    var data_success = json[2];
+                    if (data_success === true){
+                        $('#submitFIN').prop('disabled', false);
+                        $("#resultFIN").hide();
+                        $(".info-box").show();
+                        $(".userImage").attr("src", "data:"+data_employee.img.contentType+";base64,"+data_employee.img.image);
+                        $(".info-box-text").html("<b>"+data_employee.fullName+"</b>");
+                        window.fin_user_id = data_employee.id;
+                        window.success_img = "data:"+data_employee.img.contentType+";base64,"+data_employee.img.image;
+                        $("#work_log_img").attr("src", "data:"+data_employee.img.contentType+";base64,"+data_employee.img.image);
+                    }else{
+                        $(".info-box").hide();
+                        $("#resultFIN").show();
+                        $("#resultFIN").html(data_employee);
+                        $("#resultFIN").removeClass("text-warning");
+                        $("#resultFIN").addClass("text-danger");
+                        $('#submitFIN').prop('disabled', true);
+                    }
+                    // console.log();
+                }
+            };
+            var data = JSON.stringify({"pin": user_pin});
+            xhr.send(data);
+        };
+
+        $('#exampleInputBorder').on("input", function() {
+            var dInput = $("#exampleInputBorder").val().toUpperCase();;
+            if (dInput.length === 7) {
+                find_by_pin(dInput);
+            }else{
+                $("#resultFIN").show();
+                $(".info-box").hide();
+                $("#resultFIN").html("FİN 7-simvoldan ibarət olmalıdır");
+                $('#submitFIN').prop('disabled', true);
+                $("#resultFIN").removeClass("text-danger");
+                $("#resultFIN").addClass("text-warning");
+            }
+        });
+
+	</script>
+
+    
+</body>
+
+</html>

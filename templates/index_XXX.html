@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pages.css') }}">
+</head>
+
+<body>
+	<div class="links">
+		<a href="/register">Qeydiyyat</a> <a href="/compare">Müqaisə</a> <a href="/capture">Kamera</a> 
+	</div>
+	{% for usr in user_list: %}
+	<div class="employee_div">
+	<div class="img">
+		<a href="/user/{{ usr['id'] }}"><img src="data:{{ usr['imageList'][-1]['contentType'] }};base64, {{ usr['imageList'][-1]['image'] }}" alt="{{ usr['id'] }}" width="200" height="100%"></a>
+	</div>
+	<div class="info">
+		<h4><a href="/user/{{ usr['id'] }}">{{ usr["firstName"] }} {{ usr["lastName"] }}</a></h4>
+		<font>{{ usr['structure'] }}</font><br><font>{{ usr['posName'] }}</font><br>
+		<a href="/push?id={{ usr['id'] }}">Add more images</a>
+	</div>
+	</div>
+	{% endfor %}
+</body>
+</html>

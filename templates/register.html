@@ -1,0 +1,39 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Register</title>
+</head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+<body>
+	<form action="/insert" method="post" enctype="multipart/form-data">
+  
+  <h1><strong>Qeydiyyatdan keç</strong> <small>və sistemə özünü tanıt</small></h1>
+  
+  <div class="form-group">
+	  <label for="title"><span><small>Adınız</small></span></label>
+    <input type="text" name="nameUser" id="title" class="form-controll"/>
+  </div>
+  <div class="form-group">
+    <label for="caption"><span><small>Soyadınız</small></span></label>
+    <input type="text" name="lastNameUser" id="caption" class="form-controll"/>
+  </div>
+  
+  <div class="form-group file-area">
+        <label for="images">Şəkiliniz:</label><small><i>sizin şəkliniz maksimum 400x300 öıçüsündə (piksel) ola bilər</i></small>
+    <input type="file" name="profileImage" id="images" required="required" multiple="multiple"/>
+    <div class="file-dummy">
+      <div class="success">Əla, sizin şəkil seçiminiz texniki qaydalara uyğundur</div>
+      <div class="default">Xahiş edirik şəkil seçin</div>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <button type="submit">Təsdiq edin</button>
+  </div>
+  
+</form>
+
+
+<link href='https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,600,700' rel='stylesheet' type='text/css'>
+</body>
+</html>
